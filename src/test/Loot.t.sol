@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.10;
 
-import "../Avatar.sol";
+import "../Loot.sol";
 import "ds-test/test.sol";
 import "solmate/tokens/ERC721.sol";
 
@@ -17,16 +17,16 @@ contract ERC721Recipient is ERC721TokenReceiver {
     }
 }
 
-contract AvatarTest is DSTest, ERC721Recipient {
-    Avatar avatar;
+contract LootTest is DSTest, ERC721Recipient {
+    Loot avatar;
 
     function setUp() public {
         // TODO(Deploy and integrate loot here)
-        avatar = new Avatar(address(0));
+        avatar = new Loot();
     }
 
     function testMint() public {
-        avatar.mint(address(this), "Uriel");
-        avatar.mint(address(this), "Baal");
+        avatar.mint(address(this));
+        avatar.mint(address(this));
     }
 }
