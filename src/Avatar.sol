@@ -4,7 +4,6 @@ pragma solidity 0.8.10;
 import "solmate/tokens/ERC721.sol";
 
 contract Avatar is ERC721, ERC721TokenReceiver {
-
     function onERC721Received(
         address _operator,
         address _from,
@@ -36,7 +35,13 @@ contract Avatar is ERC721, ERC721TokenReceiver {
         loot = _loot;
     }
 
-    function tokenURI(uint256 id) public view virtual override returns (string memory) {
+    function tokenURI(uint256 id)
+        public
+        view
+        virtual
+        override
+        returns (string memory)
+    {
         require(id < _next_id, "Avatar not yet minted");
         // TODO(Return image and metadata)
         string memory uri = "";
@@ -59,8 +64,6 @@ contract Avatar is ERC721, ERC721TokenReceiver {
     // TODO(Equipment/loot system)
 
     function equip(uint256 id) public {
-
         // TODO(Which kind of loot is this?)
     }
-
 }

@@ -6,7 +6,6 @@ import "ds-test/test.sol";
 import "solmate/tokens/ERC721.sol";
 
 contract ERC721Recipient is ERC721TokenReceiver {
-
     function onERC721Received(
         address _operator,
         address _from,

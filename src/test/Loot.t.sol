@@ -6,7 +6,6 @@ import "ds-test/test.sol";
 import "solmate/tokens/ERC721.sol";
 
 contract ERC721Recipient is ERC721TokenReceiver {
-
     function onERC721Received(
         address _operator,
         address _from,
@@ -26,7 +25,13 @@ contract LootTest is DSTest, ERC721Recipient {
     }
 
     function testMint() public {
-        avatar.mint(address(this));
-        avatar.mint(address(this));
+        avatar.mint(address(this), Slot.Weapon, Grade.Epic, Name.PlasmaCutter);
+        avatar.mint(address(this), Slot.Armor, Grade.Uncommon, Name.LabCoat);
+        avatar.mint(
+            address(this),
+            Slot.Implant,
+            Grade.Legendary,
+            Name.CognitiveEnhancer
+        );
     }
 }
