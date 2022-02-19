@@ -2,8 +2,8 @@
 pragma solidity 0.8.11;
 
 import "./Base64.sol";
-import "./Loot.sol";
 import "solmate/tokens/ERC721.sol";
+import "./Loot.sol";
 
 contract Avatar is ERC721, ERC721TokenReceiver {
     function onERC721Received(
@@ -13,6 +13,16 @@ contract Avatar is ERC721, ERC721TokenReceiver {
         bytes calldata
     ) public virtual override returns (bytes4) {
         return ERC721TokenReceiver.onERC721Received.selector;
+    }
+
+    // TODO(Figure out an elegant way to combine these)
+    struct AvatarDetails {
+        uint64 hp;
+        uint64 dp;
+        uint64 ap;
+        string armor;
+        string weapon;
+        string implant;
     }
 
     struct AvatarSheet {
@@ -90,19 +100,46 @@ contract Avatar is ERC721, ERC721TokenReceiver {
         // TODO(Replace character image)
         require(id < _next_id, "Avatar not yet minted");
         AvatarSheet memory avatarSheet = sheet[id];
+        AvatarDetails memory avatarDetails;
 
-        // Base stats
-        uint64 hp = 5;
-        uint64 ap = 1;
-        uint64 dp = 1;
+        // Base details
+        avatarDetails.hp = 5;
+        avatarDetails.ap = 1;
+        avatarDetails.dp = 1;
+        avatarDetails.armor = "Worn Lab Coat";
+        avatarDetails.weapon = "Used Plasma Cutter";
+        avatarDetails.implant = "No Implant";
 
         // Account for experience
         if (avatarSheet.experience >= 100) {
             uint64 buff = avatarSheet.experience / 100;
-            hp += buff;
-            ap += buff;
-            dp += buff;
+            avatarDetails.hp += buff;
+            avatarDetails.ap += buff;
+            avatarDetails.dp += buff;
         }
+
+        // Get Item info
+
+        Loot iLoot = Loot(address(loot));
+
+        if (avatarSheet.armor > 0) {
+            avatarDetails.armor = iLoot.tokenName(avatarSheet.armor);
+            avatarDetails.dp += uint64(iLoot.lootInfo(avatarSheet.armor).grade);
+        }
+        if (avatarSheet.weapon > 0) {
+            avatarDetails.weapon = iLoot.tokenName(avatarSheet.weapon);
+            avatarDetails.ap += uint64(
+                iLoot.lootInfo(avatarSheet.weapon).grade
+            );
+        }
+        if (avatarSheet.implant > 0) {
+            avatarDetails.implant = iLoot.tokenName(avatarSheet.implant);
+            avatarDetails.hp += uint64(
+                iLoot.lootInfo(avatarSheet.implant).grade
+            );
+        }
+
+        // Construct JSON
 
         string memory json = Base64.encode(
             bytes(
@@ -111,12 +148,20 @@ contract Avatar is ERC721, ERC721TokenReceiver {
                         '{"name": "',
                         avatarSheet.name,
                         '", "description": "An avatar ready to fight moloch", "image": "ar://rfE4aIDBs-O_rX-WgkA3ShQoop5thwHESqfJs8C4OIY", "attributes": [{"trait_type": "HP", "value": "',
-                        toString(hp),
-                        '"}, {"trait_type": "AP", "value": "',
-                        toString(ap),
-                        '")}, {"trait_type": "AP", "value": "',
-                        toString(dp),
-                        '")}]}'
+                        toString(avatarDetails.hp),
+                        '"}, {"trait_type": "AP", "value": ',
+                        toString(avatarDetails.ap),
+                        ')}, {"trait_type": "AP", "value": ',
+                        toString(avatarDetails.dp),
+                        ')},{"trait_type": "Armor", "value": "',
+                        avatarDetails.armor,
+                        '")}, {"trait_type": "Weapon", "value": "',
+                        avatarDetails.weapon,
+                        '")}, {"trait_type": "Implant", "value": "',
+                        avatarDetails.implant,
+                        '")}, {"trait_type": "Experience", "value": ',
+                        toString(avatarSheet.experience),
+                        ")}]}"
                     )
                 )
             )

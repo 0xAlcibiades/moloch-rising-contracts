@@ -76,32 +76,26 @@ contract Loot is ERC721 {
         // Grade mapping to strings
         if (info.grade == Grade.Common) {
             grade = "Common";
-        }
-        else if (info.grade == Grade.Uncommon) {
+        } else if (info.grade == Grade.Uncommon) {
             grade = "Uncommon";
-        }
-        else if (info.grade == Grade.Rare) {
+        } else if (info.grade == Grade.Rare) {
             grade = "Rare";
-        }
-        else if (info.grade == Grade.Epic) {
+        } else if (info.grade == Grade.Epic) {
             grade = "Epic";
-        }
-        else if (info.grade == Grade.Legendary) {
+        } else if (info.grade == Grade.Legendary) {
             grade = "Legendary";
         }
 
         // Name mapping to strings
         if (info.name == Name.LabCoat) {
             name = "Lab Coat";
-        }
-        else if (info.name == Name.PlasmaCutter) {
+        } else if (info.name == Name.PlasmaCutter) {
             name = "Plasma Cutter";
-        }
-        else if (info.name == Name.PainSuppressor) {
+        } else if (info.name == Name.PainSuppressor) {
             name = "Pain Suppressor";
         }
 
-        return string(abi.encodePacked(grade," ",name));
+        return string(abi.encodePacked(grade, " ", name));
     }
 
     /* solhint-disable quotes */
@@ -123,11 +117,11 @@ contract Loot is ERC721 {
     }
 
     function tokenURI(uint256 id)
-    public
-    view
-    virtual
-    override
-    returns (string memory)
+        public
+        view
+        virtual
+        override
+        returns (string memory)
     {
         // TODO(Replace loot image)
         // TODO(Add item metadata)
