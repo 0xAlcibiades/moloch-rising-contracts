@@ -39,7 +39,7 @@ contract AvatarTest is DSTest, ERC721Recipient {
             address(this),
             Slot.Implant,
             Grade.Legendary,
-            Name.CognitiveEnhancer
+            Name.PainSuppressor
         );
         loot.setApprovalForAll(address(avatar), true);
         avatar.equip(1, 0);
@@ -51,7 +51,7 @@ contract AvatarTest is DSTest, ERC721Recipient {
             address(this),
             Slot.Implant,
             Grade.Legendary,
-            Name.CognitiveEnhancer
+            Name.PainSuppressor
         );
         avatar.equip(4, 0);
         avatar.equip(5, 0);
@@ -94,7 +94,7 @@ contract AvatarTest is DSTest, ERC721Recipient {
             address(this),
             Slot.Implant,
             Grade.Legendary,
-            Name.CognitiveEnhancer
+            Name.PainSuppressor
         );
         loot.setApprovalForAll(address(avatar), true);
         avatar.equip(1, 0);

@@ -31,7 +31,7 @@ contract LootTest is DSTest, ERC721Recipient {
             address(this),
             Slot.Implant,
             Grade.Legendary,
-            Name.CognitiveEnhancer
+            Name.PainSuppressor
         );
     }
 }

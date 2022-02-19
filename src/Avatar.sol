@@ -36,6 +36,7 @@ contract Avatar is ERC721, ERC721TokenReceiver {
         loot = _loot;
     }
 
+    // TODO(Factor out to library)
     /**
      * @dev Converts a `uint256` to its ASCII `string` decimal representation.
      */
