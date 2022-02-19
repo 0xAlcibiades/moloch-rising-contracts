@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BUSL 1.1
 pragma solidity 0.8.11;
 
+import "./Base64.sol";
 import "./Loot.sol";
 import "solmate/tokens/ERC721.sol";
 
@@ -36,6 +37,32 @@ contract Avatar is ERC721, ERC721TokenReceiver {
         loot = _loot;
     }
 
+    /**
+     * @dev Converts a `uint256` to its ASCII `string` decimal representation.
+     */
+    function toString(uint256 value) internal pure returns (string memory) {
+        // Inspired by OraclizeAPI's implementation - MIT licence
+        // https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol
+
+        if (value == 0) {
+            return "0";
+        }
+        uint256 temp = value;
+        uint256 digits;
+        while (temp != 0) {
+            digits++;
+            temp /= 10;
+        }
+        bytes memory buffer = new bytes(digits);
+        while (value != 0) {
+            digits -= 1;
+            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
+            value /= 10;
+        }
+        return string(buffer);
+    }
+
+    /* solhint-disable quotes */
     function tokenURI(uint256 id)
         public
         view
@@ -44,10 +71,16 @@ contract Avatar is ERC721, ERC721TokenReceiver {
         returns (string memory)
     {
         require(id < _next_id, "Avatar not yet minted");
-        // TODO(Return image and metadata)
-        string memory uri = "";
-        return uri;
+        AvatarSheet memory avatarSheet = sheet[id];
+        string memory json = Base64.encode(
+            bytes(
+                string(abi.encodePacked('{"name": "', avatarSheet.name, '"}'))
+            )
+        );
+        return string(abi.encodePacked("data:application/json;base64,", json));
     }
+
+    /* solhint-enable quotes */
 
     function mint(address to, string memory newAvatarName) public virtual {
         // TODO(Does the character need that VRF seed?)

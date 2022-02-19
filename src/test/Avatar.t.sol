@@ -80,4 +80,21 @@ contract AvatarTest is DSTest, ERC721Recipient {
         avatar.equip(1, 0);
         avatar.unequip(1, 0);
     }
+
+    function testTokenURI() public {
+        avatar.mint(address(this), "Uriel");
+        loot.mint(address(this), Slot.Weapon, Grade.Epic, Name.PlasmaCutter);
+        loot.mint(address(this), Slot.Armor, Grade.Uncommon, Name.LabCoat);
+        loot.mint(
+            address(this),
+            Slot.Implant,
+            Grade.Legendary,
+            Name.CognitiveEnhancer
+        );
+        loot.setApprovalForAll(address(avatar), true);
+        avatar.equip(1, 0);
+        avatar.equip(2, 0);
+        avatar.equip(3, 0);
+        avatar.tokenURI(0);
+    }
 }
