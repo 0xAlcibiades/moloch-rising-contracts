@@ -79,7 +79,6 @@ contract Avatar is ERC721, ERC721TokenReceiver {
         return string(abi.encodePacked("data:application/json;base64,", json));
     }
 
-    /* solhint-disable quotes */
     function tokenURI(uint256 id)
         public
         view
