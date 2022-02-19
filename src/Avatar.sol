@@ -141,32 +141,48 @@ contract Avatar is ERC721, ERC721TokenReceiver {
 
         // Construct JSON
 
-        string memory json = Base64.encode(
-            bytes(
-                string(
-                    abi.encodePacked(
-                        '{"name": "',
-                        avatarSheet.name,
-                        '", "description": "An avatar ready to fight moloch", "image": "ar://rfE4aIDBs-O_rX-WgkA3ShQoop5thwHESqfJs8C4OIY", "attributes": [{"trait_type": "HP", "value": "',
-                        toString(avatarDetails.hp),
-                        '"}, {"trait_type": "AP", "value": ',
-                        toString(avatarDetails.ap),
-                        ')}, {"trait_type": "AP", "value": ',
-                        toString(avatarDetails.dp),
-                        ')},{"trait_type": "Armor", "value": "',
-                        avatarDetails.armor,
-                        '")}, {"trait_type": "Weapon", "value": "',
-                        avatarDetails.weapon,
-                        '")}, {"trait_type": "Implant", "value": "',
-                        avatarDetails.implant,
-                        '")}, {"trait_type": "Experience", "value": ',
-                        toString(avatarSheet.experience),
-                        ")}]}"
-                    )
+        string memory encoded;
+        {
+            // Construct JSON
+            bytes memory encoded1;
+            {
+                encoded1 = abi.encodePacked(
+                    '{"name": "',
+                    avatarSheet.name,
+                    '", "description": "An avatar ready to fight moloch", "image": "ar://rfE4aIDBs-O_rX-WgkA3ShQoop5thwHESqfJs8C4OIY", "attributes": [{"trait_type": "HP", "value": "',
+                    toString(avatarDetails.hp),
+                    '"}, {"trait_type": "AP", "value": ',
+                    toString(avatarDetails.ap),
+                    "},"
+                );
+            }
+            bytes memory encoded2;
+            {
+                encoded2 = abi.encodePacked(
+                    '{"trait_type": "AP", "value": ',
+                    toString(avatarDetails.dp),
+                    '},{"trait_type": "Armor", "value": "',
+                    avatarDetails.armor,
+                    '"}, {"trait_type": "Weapon", "value": "',
+                    avatarDetails.weapon,
+                    '"}, {"trait_type": "Implant", "value": "',
+                    avatarDetails.implant,
+                    '"}, {"trait_type": "Experience", "value": ',
+                    toString(avatarSheet.experience),
+                    "}]}"
+                );
+            }
+
+            encoded = string(abi.encodePacked(encoded1, encoded2));
+        }
+
+        return
+            string(
+                abi.encodePacked(
+                    "data:application/json;base64,",
+                    Base64.encode(bytes(encoded))
                 )
-            )
-        );
-        return string(abi.encodePacked("data:application/json;base64,", json));
+            );
     }
 
     /* solhint-enable quotes */
