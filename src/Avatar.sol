@@ -15,11 +15,10 @@ contract Avatar is ERC721, ERC721TokenReceiver {
         return ERC721TokenReceiver.onERC721Received.selector;
     }
 
-    // TODO(Later, these characters can be deposited for a v1 character)
     struct AvatarSheet {
         string name;
         // Experience counter
-        uint256 experience;
+        uint64 experience;
         // Links to the loot NFT
         uint256 weapon;
         uint256 armor;
@@ -63,6 +62,24 @@ contract Avatar is ERC721, ERC721TokenReceiver {
     }
 
     /* solhint-disable quotes */
+    function contractURI() public view returns (string memory) {
+        // TODO(add multisig here in fee_recipient)
+        // TODO(update image to correct one in arweave)
+        string memory json = Base64.encode(
+            bytes(
+                string(
+                    abi.encodePacked(
+                        '{"name": "Moloch Rises Avatars", "description:": "Avatars for playing the Moloch Rises roguelite", "seller_fee_basis_points": ',
+                        toString(250),
+                        ', "external_link": "https://molochrises.com/", "image": "ar://rfE4aIDBs-O_rX-WgkA3ShQoop5thwHESqfJs8C4OIY", "fee_recipient": "0x36273803306a3c22bc848f8db761e974697ece0d"}'
+                    )
+                )
+            )
+        );
+        return string(abi.encodePacked("data:application/json;base64,", json));
+    }
+
+    /* solhint-disable quotes */
     function tokenURI(uint256 id)
         public
         view
@@ -70,11 +87,38 @@ contract Avatar is ERC721, ERC721TokenReceiver {
         override
         returns (string memory)
     {
+        // TODO(Replace character image)
         require(id < _next_id, "Avatar not yet minted");
         AvatarSheet memory avatarSheet = sheet[id];
+
+        // Base stats
+        uint64 hp = 5;
+        uint64 ap = 1;
+        uint64 dp = 1;
+
+        // Account for experience
+        if (avatarSheet.experience >= 100) {
+            uint64 buff = avatarSheet.experience / 100;
+            hp += buff;
+            ap += buff;
+            dp += buff;
+        }
+
         string memory json = Base64.encode(
             bytes(
-                string(abi.encodePacked('{"name": "', avatarSheet.name, '"}'))
+                string(
+                    abi.encodePacked(
+                        '{"name": "',
+                        avatarSheet.name,
+                        '", "description": "An avatar ready to fight moloch", "image": "ar://rfE4aIDBs-O_rX-WgkA3ShQoop5thwHESqfJs8C4OIY", "attributes": [{"trait_type": "HP", "value": "',
+                        toString(hp),
+                        '"}, {"trait_type": "AP", "value": "',
+                        toString(ap),
+                        '")}, {"trait_type": "AP", "value": "',
+                        toString(dp),
+                        '")}]}'
+                    )
+                )
             )
         );
         return string(abi.encodePacked("data:application/json;base64,", json));
