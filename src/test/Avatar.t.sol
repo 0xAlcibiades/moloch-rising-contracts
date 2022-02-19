@@ -81,6 +81,11 @@ contract AvatarTest is DSTest, ERC721Recipient {
         avatar.unequip(1, 0);
     }
 
+    // TODO(Add assertions about binary content)
+    function testContractURI() public {
+        avatar.contractURI();
+    }
+
     function testTokenURI() public {
         avatar.mint(address(this), "Uriel");
         loot.mint(address(this), Slot.Weapon, Grade.Epic, Name.PlasmaCutter);
