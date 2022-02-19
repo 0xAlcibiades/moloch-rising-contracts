@@ -6,6 +6,9 @@ import "solmate/tokens/ERC721.sol";
 import "./Loot.sol";
 
 contract Avatar is ERC721, ERC721TokenReceiver {
+    address public immutable feeRecipient =
+        0x36273803306a3C22bc848f8Db761e974697ece0d;
+
     function onERC721Received(
         address,
         address,
@@ -44,6 +47,16 @@ contract Avatar is ERC721, ERC721TokenReceiver {
 
     constructor(address _loot) ERC721("Moloch Rising Avatar", "MRA") {
         loot = _loot;
+    }
+
+    // Function to receive Ether. msg.data must be empty
+    receive() external payable {
+        revert("Incorrect function paid");
+    }
+
+    // Fallback function is called when msg.data is not empty
+    fallback() external payable {
+        revert("Incorrect function paid");
     }
 
     // TODO(Factor out to library)
@@ -97,6 +110,7 @@ contract Avatar is ERC721, ERC721TokenReceiver {
         override
         returns (string memory)
     {
+        // TODO(There are almost certainly gas optimizations to be had here)
         // TODO(Replace character image)
         require(id < _next_id, "Avatar not yet minted");
         AvatarSheet memory avatarSheet = sheet[id];
@@ -187,8 +201,16 @@ contract Avatar is ERC721, ERC721TokenReceiver {
 
     /* solhint-enable quotes */
 
-    function mint(address to, string memory newAvatarName) public virtual {
-        // TODO(Does the character need that VRF seed?)
+    function mint(address to, string memory newAvatarName)
+        public
+        payable
+        virtual
+    {
+        require(msg.value == 5 ether, "Minting requires 5 Matic");
+        bool sent = payable(feeRecipient).send(msg.value);
+        require(sent, "Failed to send Matic");
+
+        // TODO(Does the character need a VRF seed)
 
         // Get the next token id
         uint256 tokenId = _next_id;
@@ -200,13 +222,9 @@ contract Avatar is ERC721, ERC721TokenReceiver {
         // Increment ID
         _next_id += 1;
 
-        // TODO(Charge mint cost here?)
-
         // Mint the NFT
         _safeMint(to, tokenId);
     }
-
-    // TODO(Equipment/loot system)
 
     // Will equip or re-equip a loot item to an avatar slot
     function equip(uint256 lootId, uint256 avatarId) public {
@@ -280,5 +298,10 @@ contract Avatar is ERC721, ERC721TokenReceiver {
             // Send the unequipped item to the sender
             iLoot.safeTransferFrom(address(this), msg.sender, unequipped);
         }
+    }
+
+    // TODO(Auth)
+    function increase_experience(uint64 amount, uint256 avatarId) public {
+        sheet[avatarId].experience += amount;
     }
 }

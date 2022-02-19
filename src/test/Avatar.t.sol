@@ -27,12 +27,12 @@ contract AvatarTest is DSTest, ERC721Recipient {
     }
 
     function testMint() public {
-        avatar.mint(address(this), "Uriel");
-        avatar.mint(address(this), "Baal");
+        avatar.mint{value: 5 ether}(address(this), "Uriel");
+        avatar.mint{value: 5 ether}(address(this), "Baal");
     }
 
     function testEquip() public {
-        avatar.mint(address(this), "Uriel");
+        avatar.mint{value: 5 ether}(address(this), "Uriel");
         loot.mint(address(this), Slot.Weapon, Grade.Epic, Name.PlasmaCutter);
         loot.mint(address(this), Slot.Armor, Grade.Uncommon, Name.LabCoat);
         loot.mint(
@@ -60,14 +60,14 @@ contract AvatarTest is DSTest, ERC721Recipient {
 
     function testFailEquip() public {
         loot.setApprovalForAll(address(avatar), true);
-        avatar.mint(address(this), "Uriel");
+        avatar.mint{value: 5 ether}(address(this), "Uriel");
         loot.mint(address(this), Slot.Weapon, Grade.Epic, Name.PlasmaCutter);
         avatar.equip(0, 0);
     }
 
     function testFailUnequip() public {
         loot.setApprovalForAll(address(avatar), true);
-        avatar.mint(address(this), "Uriel");
+        avatar.mint{value: 5 ether}(address(this), "Uriel");
         avatar.unequip(0, 0);
         loot.mint(address(this), Slot.Weapon, Grade.Epic, Name.PlasmaCutter);
         avatar.unequip(1, 0);
@@ -75,7 +75,7 @@ contract AvatarTest is DSTest, ERC721Recipient {
 
     function testUnequip() public {
         loot.setApprovalForAll(address(avatar), true);
-        avatar.mint(address(this), "Uriel");
+        avatar.mint{value: 5 ether}(address(this), "Uriel");
         loot.mint(address(this), Slot.Weapon, Grade.Epic, Name.PlasmaCutter);
         avatar.equip(1, 0);
         avatar.unequip(1, 0);
@@ -87,7 +87,7 @@ contract AvatarTest is DSTest, ERC721Recipient {
     }
 
     function testTokenURI() public {
-        avatar.mint(address(this), "Uriel");
+        avatar.mint{value: 5 ether}(address(this), "Uriel");
         loot.mint(address(this), Slot.Weapon, Grade.Epic, Name.PlasmaCutter);
         loot.mint(address(this), Slot.Armor, Grade.Uncommon, Name.LabCoat);
         loot.mint(

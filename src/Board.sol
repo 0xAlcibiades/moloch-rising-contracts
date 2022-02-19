@@ -3,6 +3,9 @@ pragma solidity 0.8.11;
 
 // TODO(Verify zkSNARK)
 contract Board {
+    address public immutable feeRecipient =
+        0x36273803306a3C22bc848f8Db761e974697ece0d;
+
     struct Game {
         bool started;
         bool completed;
@@ -15,12 +18,24 @@ contract Board {
     mapping(uint64 => Game) gameInfo;
 
     constructor(uint256 _seed) {
-        // TODO(Does this need to be per game via VRF?)
         // This is the seed used to produce numbers
         seed = _seed;
     }
 
-    function start() public returns (uint64 playId) {
+    // Function to receive Ether. msg.data must be empty
+    receive() external payable {
+        revert("Incorrect function paid");
+    }
+
+    // Fallback function is called when msg.data is not empty
+    fallback() external payable {
+        revert("Incorrect function paid");
+    }
+
+    function start() public payable returns (uint64 playId) {
+        require(msg.value == 1 ether, "Playing requires 1 Matic");
+        bool sent = payable(feeRecipient).send(msg.value);
+        require(sent, "Failed to send Matic");
         // Start should take a player and then lock the player in the game until completion
         playId = _nextPlayId;
         _nextPlayId += 1;

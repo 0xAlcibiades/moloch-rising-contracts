@@ -13,14 +13,14 @@ contract BoardTest is DSTest {
     }
 
     function testStart() public {
-        uint64 game0 = board.start();
-        uint64 game1 = board.start();
+        uint64 game0 = board.start{value: 1 ether}();
+        uint64 game1 = board.start{value: 1 ether}();
         assert(game0 == 0);
         assert(game1 == 1);
     }
 
     function testComplete() public {
-        board.start();
+        board.start{value: 1 ether}();
         board.complete(0);
     }
 }

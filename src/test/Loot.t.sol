@@ -34,4 +34,14 @@ contract LootTest is DSTest, ERC721Recipient {
             Name.PainSuppressor
         );
     }
+
+    // TODO(Add assertions about binary content)
+    function testContractURI() public {
+        loot.contractURI();
+    }
+
+    function testTokenURI() public {
+        loot.mint(address(this), Slot.Weapon, Grade.Epic, Name.PlasmaCutter);
+        loot.tokenURI(1);
+    }
 }
