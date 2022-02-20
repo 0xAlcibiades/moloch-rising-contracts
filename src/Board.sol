@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: BUSL 1.1
 pragma solidity 0.8.10;
 
+import "./Avatar.sol";
+
 // TODO(Avatar experience mechanic)
 // TODO(Loot drop mechanic)
 // TODO(Verify zkSNARK)

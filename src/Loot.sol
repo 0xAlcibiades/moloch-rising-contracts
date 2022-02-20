@@ -42,7 +42,7 @@ contract Loot is ERC721, MultiRolesAuthority {
 
     constructor()
         MultiRolesAuthority(msg.sender, Authority(address(0)))
-        ERC721("Moloch Rising Loot", "MRL")
+        ERC721("Moloch Rises Loot", "MRL")
     {
         setRoleCapability(0, 0x100af824, true);
         setRoleCapability(0, 0x2affe684, true);
@@ -123,9 +123,9 @@ contract Loot is ERC721, MultiRolesAuthority {
             bytes(
                 string(
                     abi.encodePacked(
-                        '{"name": "Moloch Rises Loot", "description:": "Loot for playing the Moloch Rises roguelite", "seller_fee_basis_points": ',
+                        '{"name": "Moloch Rises Loot", "description:": "Loot for playing the Moloch Rises roguelite.", "seller_fee_basis_points": ',
                         toString(250),
-                        ', "external_link": "https://molochrises.com/", "image": "ar://rfE4aIDBs-O_rX-WgkA3ShQoop5thwHESqfJs8C4OIY", "fee_recipient": "0x36273803306a3c22bc848f8db761e974697ece0d"}'
+                        ', "external_link": "https://molochrises.com/", "image": "ipfs://bafkreihuy7ln4il3ou4ne5gtqnwwuqfb5enbuk5dzqpmcmisinikkdccc4", "fee_recipient": "0xf395C4B180a5a08c91376fa2A503A3e3ec652Ef5"}'
                     )
                 )
             )
@@ -150,7 +150,7 @@ contract Loot is ERC721, MultiRolesAuthority {
                     abi.encodePacked(
                         '{"name": "',
                         tokenName(id),
-                        '", "description": "Loot for fighting moloch", "image": "ar://rfE4aIDBs-O_rX-WgkA3ShQoop5thwHESqfJs8C4OIY"}'
+                        '", "description": "Loot for fighting moloch.", "image": "ipfs://bafkreihuy7ln4il3ou4ne5gtqnwwuqfb5enbuk5dzqpmcmisinikkdccc4Y"}'
                     )
                 )
             )
