@@ -14,7 +14,7 @@ contract Avatar is
     VRFConsumerBase
 {
     address public immutable feeRecipient =
-        0x36273803306a3C22bc848f8Db761e974697ece0d;
+        0xf395C4B180a5a08c91376fa2A503A3e3ec652Ef5;
 
     bytes32 internal keyHash;
     uint256 internal fee;
@@ -69,7 +69,7 @@ contract Avatar is
     )
         VRFConsumerBase(VrfCoordinator, linkToken)
         MultiRolesAuthority(msg.sender, Authority(address(0)))
-        ERC721("Moloch Rising Avatar", "MRA")
+        ERC721("Moloch Rises Avatar", "MRA")
     {
         keyHash = VrfkeyHash;
         fee = VrfFee;
@@ -149,7 +149,7 @@ contract Avatar is
                     abi.encodePacked(
                         '{"name": "Moloch Rises Avatars", "description:": "Avatars for playing the Moloch Rises roguelite", "seller_fee_basis_points": ',
                         toString(250),
-                        ', "external_link": "https://molochrises.com/", "image": "ar://rfE4aIDBs-O_rX-WgkA3ShQoop5thwHESqfJs8C4OIY", "fee_recipient": "0x9544a9249d8fc6b28faf211f5e616aaf8ac13e62"}'
+                        ', "external_link": "https://molochrises.com/", "image": "ipfs://bafkreihlv2vnrwoirui6ox2rxwavk7ufpuukh5q2iyn37ofiiemv67kzwa", "fee_recipient": "0xf395C4B180a5a08c91376fa2A503A3e3ec652Ef5"}'
                     )
                 )
             )
@@ -215,17 +215,17 @@ contract Avatar is
                 encoded1 = abi.encodePacked(
                     '{"name": "',
                     avatarSheet.name,
-                    '", "description": "An avatar ready to fight moloch", "image": "ipfs://bafkreib4ftqeobfmdy7kvurixv55m7nqtvwj3o2hw3clsyo3hjpxwo3sda", "attributes": [{"trait_type": "HP", "value": ',
+                    '", "description": "An avatar ready to fight moloch.", "image": "ipfs://bafkreib4ftqeobfmdy7kvurixv55m7nqtvwj3o2hw3clsyo3hjpxwo3sda", "attributes": [{"trait_type": "HP", "value": ',
                     toString(avatarDetails.hp),
                     '}, {"trait_type": "AP", "value": ',
                     toString(avatarDetails.ap),
-                    "},"
+                    "}, "
                 );
             }
             bytes memory encoded2;
             {
                 encoded2 = abi.encodePacked(
-                    '{"trait_type": "AP", "value": ',
+                    '{"trait_type": "DP", "value": ',
                     toString(avatarDetails.dp),
                     '},{"trait_type": "Armor", "value": "',
                     avatarDetails.armor,
@@ -235,8 +235,6 @@ contract Avatar is
                     avatarDetails.implant,
                     '"}, {"trait_type": "Experience", "value": ',
                     toString(avatarSheet.experience),
-                    '}, {"trait_type": "Seed", "value": ',
-                    toString(avatarSheet.seed),
                     "}]}"
                 );
             }
@@ -260,7 +258,8 @@ contract Avatar is
         payable
         virtual
     {
-        require(msg.value == 5 ether, "Minting requires 5 Matic");
+        // TODO(change back to 5 matic)
+        require(msg.value == 0.001 ether, "Minting requires 5 Matic");
         bool sent = payable(feeRecipient).send(msg.value);
         require(sent, "Failed to send Matic");
 
