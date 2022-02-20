@@ -149,7 +149,7 @@ contract Avatar is
                     abi.encodePacked(
                         '{"name": "Moloch Rises Avatars", "description:": "Avatars for playing the Moloch Rises roguelite", "seller_fee_basis_points": ',
                         toString(250),
-                        ', "external_link": "https://molochrises.com/", "image": "ar://rfE4aIDBs-O_rX-WgkA3ShQoop5thwHESqfJs8C4OIY", "fee_recipient": "0x36273803306a3c22bc848f8db761e974697ece0d"}'
+                        ', "external_link": "https://molochrises.com/", "image": "ar://rfE4aIDBs-O_rX-WgkA3ShQoop5thwHESqfJs8C4OIY", "fee_recipient": "0x9544a9249d8fc6b28faf211f5e616aaf8ac13e62"}'
                     )
                 )
             )
