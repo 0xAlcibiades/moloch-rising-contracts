@@ -44,7 +44,7 @@ contract BoardTest is DSTest, ERC721Recipient, TestUtility {
 
     function testStart() public {
         avatar.mint{value: 0.001 ether}(address(this), "Uriel");
-        (uint64 game1Id, Board.Game memory game0) = board.start{
+        (uint64 game1Id, Board.Game memory game1) = board.start{
             value: 0.001 ether
         }(0);
         assert(game1Id == 1);
@@ -52,7 +52,7 @@ contract BoardTest is DSTest, ERC721Recipient, TestUtility {
 
     function testComplete() public {
         avatar.mint{value: 0.001 ether}(address(this), "Uriel");
-        board.start{value: 0.001 ether}(0);
-        board.complete(1);
+        (uint64 game1Id, Board.Game memory game1) = board.start{value: 0.001 ether}(0);
+        board.complete(game1Id, game1);
     }
 }

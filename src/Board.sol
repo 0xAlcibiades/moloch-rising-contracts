@@ -4,9 +4,6 @@ pragma solidity 0.8.10;
 import "./Avatar.sol";
 import "solmate/auth/authorities/MultiRolesAuthority.sol";
 
-// TODO(Avatar experience mechanic)
-// TODO(Loot drop mechanic)
-// TODO(Verify zkSNARK)
 contract Board is MultiRolesAuthority {
     address public immutable feeRecipient =
         0xf395C4B180a5a08c91376fa2A503A3e3ec652Ef5;
@@ -19,12 +16,13 @@ contract Board is MultiRolesAuthority {
         bool started;
         bool completed;
         bool victory;
+        bool resign;
     }
 
     // 0 is reserved here to indicate player not in a game
     uint64 _nextPlayId = 1;
 
-    mapping(uint256 => uint64) public playerGame;
+    mapping(uint256 => uint64) public avatarGame;
 
     mapping(uint64 => Game) public gameInfo;
 
@@ -51,7 +49,7 @@ contract Board is MultiRolesAuthority {
         payable
         returns (uint64 playId, Game memory gameInstance)
     {
-        require(playerGame[avatarId] == 0, "Player already in game");
+        require(avatarGame[avatarId] == 0, "Player already in game");
 
         // Get avatar info
         Avatar IAvatar = Avatar(payable(avatar));
@@ -69,6 +67,8 @@ contract Board is MultiRolesAuthority {
 
         playId = _nextPlayId;
 
+        avatarGame[avatarId] = playId;
+
         // TODO(Add method to avatar to just get seed, for a huge gas savings - out of time)
         (, , , , , , uint256 seed) = IAvatar.sheet(avatarId);
 
@@ -76,6 +76,7 @@ contract Board is MultiRolesAuthority {
             avatarId,
             uint256(keccak256(abi.encode(seed, playId))),
             true,
+            false,
             false,
             false
         );
@@ -85,16 +86,38 @@ contract Board is MultiRolesAuthority {
         _nextPlayId += 1;
     }
 
-    // This is where the challenge will lay.
-    function complete(uint64 gameId) public {
+    function complete(uint64 gameId, Game memory gameData) public {
         require(gameId < _nextPlayId, "Game not found");
-        Game memory gameInstance = gameInfo[gameId];
-        // TODO(Verify zkSNARK)
-        // If valid playthrough
-        gameInfo[gameId].completed = true;
-        // If victory
-        gameInfo[gameId].victory = true;
-        // Set player as out of game
-        playerGame[gameInstance.avatar] = 0;
+
+        // Get avatar info
+        Avatar IAvatar = Avatar(payable(avatar));
+        Game storage gameState = gameInfo[gameId];
+
+        require(
+            msg.sender == IAvatar.ownerOf(gameState.avatar),
+            "Must own character to finish game"
+        );
+
+        // Update game state
+        bool lost = true;
+        if (gameData.resign) {
+            // End without validating playthrough
+            avatarGame[gameData.avatar] = 0;
+            gameState.resign = true;
+        } else {
+            // TODO(Verify zkSNARK before just accepting this)
+            lost = gameData.victory;
+        }
+        if (lost) {
+            // TODO(NFT damage mechanic)
+            gameState.victory = false;
+        } else {
+            // TODO(Avatar experience mechanic)
+            // TODO(Loot drop mechanic)
+            gameState.victory = true;
+        }
+        gameState.completed = true;
     }
+
+    // TODO(Resign)
 }
