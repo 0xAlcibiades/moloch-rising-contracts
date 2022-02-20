@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.11;
+pragma solidity 0.8.10;
 
 import "../Loot.sol";
 import "../Avatar.sol";
 import "ds-test/test.sol";
 import "solmate/tokens/ERC721.sol";
+import "../Board.sol";
+import "./Utilities.sol";
 
 contract ERC721Recipient is ERC721TokenReceiver {
     function onERC721Received(
@@ -17,13 +19,17 @@ contract ERC721Recipient is ERC721TokenReceiver {
     }
 }
 
-contract AvatarTest is DSTest, ERC721Recipient {
+contract AvatarTest is DSTest, ERC721Recipient, TestUtility {
     Avatar avatar;
     Loot loot;
+    Board board;
 
     function setUp() public {
         loot = new Loot();
-        avatar = new Avatar(address(loot));
+        board = new Board(123456);
+        avatar = new Avatar();
+        avatar.updateLoot(address(loot));
+        avatar.addBoard(address(board));
     }
 
     function testMint() public {
@@ -101,5 +107,18 @@ contract AvatarTest is DSTest, ERC721Recipient {
         avatar.equip(2, 0);
         avatar.equip(3, 0);
         avatar.tokenURI(0);
+    }
+
+    function testIncreaseExperience() public {
+        avatar.mint{value: 5 ether}(address(this), "Uriel");
+        hevm.startPrank(address(board));
+        avatar.increaseExperience(100, 0);
+        hevm.stopPrank();
+    }
+
+    function testFailIncreaseExperience() public {
+        hevm.startPrank(address(board));
+        avatar.increaseExperience(100, 0);
+        hevm.stopPrank();
     }
 }

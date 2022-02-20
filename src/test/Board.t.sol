@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.11;
+pragma solidity 0.8.10;
 
 import "../Board.sol";
 import "ds-test/test.sol";
@@ -13,14 +13,14 @@ contract BoardTest is DSTest {
     }
 
     function testStart() public {
-        uint64 game0 = board.start{value: 1 ether}();
-        uint64 game1 = board.start{value: 1 ether}();
+        (uint64 game0, uint256 seed0) = board.start{value: 1 ether}(0);
+        (uint64 game1, uint256 seed1) = board.start{value: 1 ether}(0);
         assert(game0 == 0);
         assert(game1 == 1);
     }
 
     function testComplete() public {
-        board.start{value: 1 ether}();
+        board.start{value: 1 ether}(0);
         board.complete(0);
     }
 }

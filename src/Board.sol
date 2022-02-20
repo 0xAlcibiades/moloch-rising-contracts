@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL 1.1
-pragma solidity 0.8.11;
+pragma solidity 0.8.10;
 
 // TODO(Verify zkSNARK)
 contract Board {
@@ -32,13 +32,19 @@ contract Board {
         revert("Incorrect function paid");
     }
 
-    function start() public payable returns (uint64 playId) {
+    function start(uint256 avatarId)
+        public
+        payable
+        returns (uint64 playId, uint256 gameSeed)
+    {
         require(msg.value == 1 ether, "Playing requires 1 Matic");
         bool sent = payable(feeRecipient).send(msg.value);
         require(sent, "Failed to send Matic");
         // Start should take a player and then lock the player in the game until completion
         playId = _nextPlayId;
         _nextPlayId += 1;
+        // TODO(correct seed from vrf)
+        gameSeed = seed;
         gameInfo[playId].started = true;
     }
 

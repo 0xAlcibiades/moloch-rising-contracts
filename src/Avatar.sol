@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: BUSL 1.1
-pragma solidity 0.8.11;
+pragma solidity 0.8.10;
 
 import "./Base64.sol";
 import "solmate/tokens/ERC721.sol";
 import "./Loot.sol";
+import "solmate/auth/authorities/MultiRolesAuthority.sol";
 
-contract Avatar is ERC721, ERC721TokenReceiver {
+contract Avatar is MultiRolesAuthority, ERC721, ERC721TokenReceiver {
     address public immutable feeRecipient =
         0x36273803306a3C22bc848f8Db761e974697ece0d;
 
@@ -39,14 +40,33 @@ contract Avatar is ERC721, ERC721TokenReceiver {
     }
 
     address public loot;
+    mapping(address => bool) boards;
 
     uint256 _next_id = 0;
 
     // Mapping to get stats of
     mapping(uint256 => AvatarSheet) public sheet;
 
-    constructor(address _loot) ERC721("Moloch Rising Avatar", "MRA") {
-        loot = _loot;
+    // TODO(In an ideal world, the integrated contract addresses would all be precomputed using CREATE3 and not editable)
+    constructor()
+        MultiRolesAuthority(msg.sender, Authority(address(0)))
+        ERC721("Moloch Rising Avatar", "MRA")
+    {
+        setRoleCapability(0, 0x87d0040c, true);
+        setRoleCapability(0, 0x100af824, true);
+        setRoleCapability(0, 0x2affe684, true);
+    }
+
+    function updateLoot(address lootContract) public requiresAuth {
+        loot = lootContract;
+    }
+
+    function addBoard(address boardContract) public requiresAuth {
+        boards[boardContract] = true;
+    }
+
+    function removeBoard(address boardContract) public requiresAuth {
+        boards[boardContract] = false;
     }
 
     // Function to receive Ether. msg.data must be empty
@@ -114,15 +134,14 @@ contract Avatar is ERC721, ERC721TokenReceiver {
         // TODO(Replace character image)
         require(id < _next_id, "Avatar not yet minted");
         AvatarSheet memory avatarSheet = sheet[id];
-        AvatarDetails memory avatarDetails;
-
-        // Base details
-        avatarDetails.hp = 5;
-        avatarDetails.ap = 1;
-        avatarDetails.dp = 1;
-        avatarDetails.armor = "Worn Lab Coat";
-        avatarDetails.weapon = "Used Plasma Cutter";
-        avatarDetails.implant = "No Implant";
+        AvatarDetails memory avatarDetails = AvatarDetails(
+            5,
+            1,
+            1,
+            "Worn Lab Coat",
+            "Used Plasma Cutter",
+            "No Implant"
+        );
 
         // Account for experience
         if (avatarSheet.experience >= 100) {
@@ -300,8 +319,9 @@ contract Avatar is ERC721, ERC721TokenReceiver {
         }
     }
 
-    // TODO(Auth)
-    function increase_experience(uint64 amount, uint256 avatarId) public {
+    function increaseExperience(uint64 amount, uint256 avatarId) public {
+        require(avatarId < _next_id, "Avatar not yet minted");
+        require(boards[msg.sender], "Only authz board can call.");
         sheet[avatarId].experience += amount;
     }
 }
