@@ -5,6 +5,7 @@ import "./Loot.sol";
 import "./Avatar.sol";
 import "solmate/auth/authorities/MultiRolesAuthority.sol";
 
+// TODO(Circom verifier inheritance for zkSnark)
 contract Board is MultiRolesAuthority {
     address public immutable feeRecipient =
         0xf395C4B180a5a08c91376fa2A503A3e3ec652Ef5;
@@ -123,7 +124,8 @@ contract Board is MultiRolesAuthority {
                 item = implant;
             }
             if (item != 0) {
-                // TODO(Send item to owner vault or burn)
+                // Loot was damaged beyond repair.
+                IAvatar.unequip(item, avatarId, feeRecipient);
             }
         }
     }
@@ -201,7 +203,6 @@ contract Board is MultiRolesAuthority {
             } else if (roll == 99) {
                 // drop legendary
                 Loot(payable(loot)).mint(
-
                     address(this),
                     Slot(slot),
                     Grade.Legendary,

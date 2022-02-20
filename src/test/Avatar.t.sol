@@ -91,9 +91,9 @@ contract AvatarTest is DSTest, ERC721Recipient, TestUtility {
     function testFailUnequip() public {
         loot.setApprovalForAll(address(avatar), true);
         avatar.mint{value: 5 ether}(address(this), "Uriel");
-        avatar.unequip(0, 0);
+        avatar.unequip(0, 0, address(this));
         loot.mint(address(this), Slot.Weapon, Grade.Epic, Name.PlasmaCutter);
-        avatar.unequip(1, 0);
+        avatar.unequip(1, 0, address(this));
     }
 
     function testUnequip() public {
@@ -103,7 +103,7 @@ contract AvatarTest is DSTest, ERC721Recipient, TestUtility {
         loot.mint(address(this), Slot.Weapon, Grade.Epic, Name.PlasmaCutter);
         hevm.stopPrank();
         avatar.equip(1, 0);
-        avatar.unequip(1, 0);
+        avatar.unequip(1, 0, address(this));
     }
 
     // TODO(Add assertions about binary content)

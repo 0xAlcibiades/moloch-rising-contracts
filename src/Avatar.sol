@@ -84,10 +84,12 @@ contract Avatar is
 
     function addBoard(address boardContract) public requiresAuth {
         boards[boardContract] = true;
+        Loot(loot).setApprovalForAll(boardContract, true);
     }
 
     function removeBoard(address boardContract) public requiresAuth {
         boards[boardContract] = false;
+        Loot(loot).setApprovalForAll(boardContract, true);
     }
 
     // Function to receive Ether. msg.data must be empty
@@ -325,10 +327,14 @@ contract Avatar is
         }
     }
 
-    function unequip(uint256 lootId, uint256 avatarId) public {
+    function unequip(
+        uint256 lootId,
+        uint256 avatarId,
+        address to
+    ) public {
         require(lootId != 0, "Can't unequip default gear");
         require(
-            msg.sender == this.ownerOf(avatarId),
+            (msg.sender == this.ownerOf(avatarId) || boards[msg.sender]),
             "Must own avatar to unequip."
         );
 
@@ -356,7 +362,7 @@ contract Avatar is
         // If the character already had equipment
         if (unequipped != 0) {
             // Send the unequipped item to the sender
-            iLoot.safeTransferFrom(address(this), msg.sender, unequipped);
+            iLoot.safeTransferFrom(address(this), to, unequipped);
         }
     }
 

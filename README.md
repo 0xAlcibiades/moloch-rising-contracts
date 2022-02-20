@@ -2,6 +2,8 @@
 
 Hackthon code, thar be bugs, not warranty express or implied, use at your own risk.
 
+Contracts are "complete", excluding the zkSnarks verification and some better graphics.
+
 Testing is done with forge. Prettier, solhint, slither, can be used to perform further static analysis on the project.
 
 ## Running the tests
