@@ -97,8 +97,15 @@ contract Board is MultiRolesAuthority {
             uint256 slot;
             slot = seed % 2;
             // TODO(Add method to avatar to just get seed, for a huge gas savings (6 sload) - out of time)
-            (, , , uint256 weapon, uint256 armor, uint256 implant, ) = IAvatar
-                .sheet(avatarId);
+            (
+                bool seeded,
+                uint64 experience,
+                string memory name,
+                uint256 weapon,
+                uint256 armor,
+                uint256 implant,
+                uint256 seed
+            ) = IAvatar.sheet(avatarId);
             uint256 item;
             if (slot == 0) {
                 item = weapon;
@@ -118,7 +125,21 @@ contract Board is MultiRolesAuthority {
         uint256 avatarId,
         uint256 seed
     ) internal {
-        // TODO(Experience should decrease relative to existing experience until 0)
+        uint256 max = 400;
+        // TODO(Add method to avatar to just get seed, for a huge gas savings (6 sload) - out of time)
+        (
+            bool seeded,
+            uint64 experience,
+            string memory name,
+            uint256 weapon,
+            uint256 armor,
+            uint256 implant,
+            uint256 seed
+        ) = IAvatar.sheet(avatarId);
+        if (experience < max) {
+            max = max - uint256(experience);
+            IAvatar.increaseExperience(uint64(seed % max), avatarId);
+        }
     }
 
     function lootDrop(

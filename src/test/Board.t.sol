@@ -40,6 +40,8 @@ contract BoardTest is DSTest, ERC721Recipient, TestUtility {
             );
         hevm.stopPrank();
         board.updateAvatar(address(avatar));
+        avatar.addBoard(address(board));
+        loot.addBoard(address(board));
     }
 
     function testStart() public {

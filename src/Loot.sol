@@ -140,8 +140,7 @@ contract Loot is ERC721, MultiRolesAuthority {
         override
         returns (string memory)
     {
-        // TODO(Replace loot image)
-        // TODO(Add item metadata)
+        // TODO(Replace loot image with proper item images)
         require(id < _next_id, "loot not yet minted");
 
         string memory json = Base64.encode(
