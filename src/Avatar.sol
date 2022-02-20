@@ -165,7 +165,6 @@ contract Avatar is
         returns (string memory)
     {
         // TODO(There are almost certainly gas optimizations to be had here)
-        // TODO(Replace character image)
         require(id < _next_id, "Avatar not yet minted");
         AvatarSheet memory avatarSheet = sheet[id];
         AvatarDetails memory avatarDetails = AvatarDetails(
@@ -216,7 +215,7 @@ contract Avatar is
                 encoded1 = abi.encodePacked(
                     '{"name": "',
                     avatarSheet.name,
-                    '", "description": "An avatar ready to fight moloch", "image": "ar://rfE4aIDBs-O_rX-WgkA3ShQoop5thwHESqfJs8C4OIY", "attributes": [{"trait_type": "HP", "value": ',
+                    '", "description": "An avatar ready to fight moloch", "image": "ipfs://bafkreib4ftqeobfmdy7kvurixv55m7nqtvwj3o2hw3clsyo3hjpxwo3sda", "attributes": [{"trait_type": "HP", "value": ',
                     toString(avatarDetails.hp),
                     '}, {"trait_type": "AP", "value": ',
                     toString(avatarDetails.ap),
