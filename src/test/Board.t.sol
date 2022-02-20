@@ -55,9 +55,10 @@ contract BoardTest is DSTest, ERC721Recipient, TestUtility {
 
     function testComplete() public {
         avatar.mint{value: 0.001 ether}(address(this), "Uriel");
+        avatar.mint{value: 0.001 ether}(address(this), "Alcibiades");
         (uint64 game1Id, Board.Game memory game1) = board.start{
             value: 0.001 ether
-        }(0);
+        }(1);
         game1.victory = true;
         board.complete(game1Id, game1);
     }

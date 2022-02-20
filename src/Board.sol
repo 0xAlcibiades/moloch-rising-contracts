@@ -201,7 +201,7 @@ contract Board is MultiRolesAuthority {
             } else if (roll == 99) {
                 // drop legendary
                 Loot(payable(loot)).mint(
-                
+
                     address(this),
                     Slot(slot),
                     Grade.Legendary,
