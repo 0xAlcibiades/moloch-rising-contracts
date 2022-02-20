@@ -5,6 +5,7 @@ import "../Loot.sol";
 import "../Avatar.sol";
 import "ds-test/test.sol";
 import "solmate/tokens/ERC721.sol";
+import "chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 import "../Board.sol";
 import "./Utilities.sol";
 
@@ -27,10 +28,21 @@ contract AvatarTest is DSTest, ERC721Recipient, TestUtility {
     function setUp() public {
         loot = new Loot();
         board = new Board(123456);
-        avatar = new Avatar();
+        avatar = new Avatar(
+            0x8C7382F9D8f56b33781fE506E897a4F1e2d17255,
+            0x326C977E6efc84E512bB9C30f76E30c160eD06FB,
+            0x6e75b569a01ef56d18cab6a8e71e6600d6ce853834d4a5748b720d06f878b3a4,
+            0.0001 ether
+        );
         avatar.updateLoot(address(loot));
         avatar.addBoard(address(board));
         loot.addBoard(address(board));
+        hevm.startPrank(0x9544A9249D8FC6B28FaF211f5E616aaF8Ac13E62);
+        LinkTokenInterface(0x326C977E6efc84E512bB9C30f76E30c160eD06FB).transfer(
+                address(avatar),
+                9 ether
+            );
+        hevm.stopPrank();
     }
 
     function testMint() public {

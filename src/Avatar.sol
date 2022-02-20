@@ -5,10 +5,21 @@ import "./Base64.sol";
 import "solmate/tokens/ERC721.sol";
 import "./Loot.sol";
 import "solmate/auth/authorities/MultiRolesAuthority.sol";
+import "chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 
-contract Avatar is MultiRolesAuthority, ERC721, ERC721TokenReceiver {
+contract Avatar is
+    MultiRolesAuthority,
+    ERC721,
+    ERC721TokenReceiver,
+    VRFConsumerBase
+{
     address public immutable feeRecipient =
         0x36273803306a3C22bc848f8Db761e974697ece0d;
+
+    bytes32 internal keyHash;
+    uint256 internal fee;
+
+    mapping(bytes32 => uint256) private _request_map;
 
     function onERC721Received(
         address,
@@ -30,13 +41,15 @@ contract Avatar is MultiRolesAuthority, ERC721, ERC721TokenReceiver {
     }
 
     struct AvatarSheet {
-        string name;
+        bool seeded;
         // Experience counter
         uint64 experience;
+        string name;
         // Links to the loot NFT
         uint256 weapon;
         uint256 armor;
         uint256 implant;
+        uint256 seed;
     }
 
     address public loot;
@@ -48,10 +61,18 @@ contract Avatar is MultiRolesAuthority, ERC721, ERC721TokenReceiver {
     mapping(uint256 => AvatarSheet) public sheet;
 
     // TODO(In an ideal world, the integrated contract addresses would all be precomputed using CREATE3 and not editable)
-    constructor()
+    constructor(
+        address VrfCoordinator,
+        address linkToken,
+        bytes32 VrfkeyHash,
+        uint256 VrfFee
+    )
+        VRFConsumerBase(VrfCoordinator, linkToken)
         MultiRolesAuthority(msg.sender, Authority(address(0)))
         ERC721("Moloch Rising Avatar", "MRA")
     {
+        keyHash = VrfkeyHash;
+        fee = VrfFee;
         setRoleCapability(0, 0x87d0040c, true);
         setRoleCapability(0, 0x100af824, true);
         setRoleCapability(0, 0x2affe684, true);
@@ -103,6 +124,19 @@ contract Avatar is MultiRolesAuthority, ERC721, ERC721TokenReceiver {
             value /= 10;
         }
         return string(buffer);
+    }
+
+    /**
+     * Callback function used by VRF Coordinator
+     */
+    function fulfillRandomness(bytes32 requestId, uint256 randomness)
+        internal
+        override
+    {
+        // Get tokenId from pending request
+        uint256 tokenId = _request_map[requestId];
+        sheet[tokenId].seed = randomness;
+        sheet[tokenId].seeded = true;
     }
 
     /* solhint-disable quotes */
@@ -182,9 +216,9 @@ contract Avatar is MultiRolesAuthority, ERC721, ERC721TokenReceiver {
                 encoded1 = abi.encodePacked(
                     '{"name": "',
                     avatarSheet.name,
-                    '", "description": "An avatar ready to fight moloch", "image": "ar://rfE4aIDBs-O_rX-WgkA3ShQoop5thwHESqfJs8C4OIY", "attributes": [{"trait_type": "HP", "value": "',
+                    '", "description": "An avatar ready to fight moloch", "image": "ar://rfE4aIDBs-O_rX-WgkA3ShQoop5thwHESqfJs8C4OIY", "attributes": [{"trait_type": "HP", "value": ',
                     toString(avatarDetails.hp),
-                    '"}, {"trait_type": "AP", "value": ',
+                    '}, {"trait_type": "AP", "value": ',
                     toString(avatarDetails.ap),
                     "},"
                 );
@@ -202,6 +236,8 @@ contract Avatar is MultiRolesAuthority, ERC721, ERC721TokenReceiver {
                     avatarDetails.implant,
                     '"}, {"trait_type": "Experience", "value": ',
                     toString(avatarSheet.experience),
+                    '}, {"trait_type": "Seed", "value": ',
+                    toString(avatarSheet.seed),
                     "}]}"
                 );
             }
@@ -229,6 +265,11 @@ contract Avatar is MultiRolesAuthority, ERC721, ERC721TokenReceiver {
         bool sent = payable(feeRecipient).send(msg.value);
         require(sent, "Failed to send Matic");
 
+        require(
+            LINK.balanceOf(address(this)) >= fee,
+            "Not enough LINK - fill contract with link"
+        );
+
         // TODO(Does the character need a VRF seed)
 
         // Get the next token id
@@ -243,6 +284,9 @@ contract Avatar is MultiRolesAuthority, ERC721, ERC721TokenReceiver {
 
         // Mint the NFT
         _safeMint(to, tokenId);
+
+        bytes32 requestId = requestRandomness(keyHash, fee);
+        _request_map[requestId] = tokenId;
     }
 
     // Will equip or re-equip a loot item to an avatar slot
