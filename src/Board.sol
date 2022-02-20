@@ -86,6 +86,30 @@ contract Board is MultiRolesAuthority {
         _nextPlayId += 1;
     }
 
+    function nftDamage(
+        Avatar IAvatar,
+        uint256 avatarId,
+        uint256 seed
+    ) internal {
+        // TODO(One in 10 chance for each equipped item to be damaged)
+    }
+
+    function accrueExperience(
+        Avatar IAvatar,
+        uint256 avatarId,
+        uint256 seed
+    ) internal {
+        // TODO(Experience should decrease relative to existing experience until 0)
+    }
+
+    function lootDrop(
+        Avatar IAvatar,
+        uint256 avatarId,
+        uint256 seed
+    ) internal {
+        // TODO(A random loot drop to the player should occur)
+    }
+
     function complete(uint64 gameId, Game memory gameData) public {
         require(gameId < _nextPlayId, "Game not found");
 
@@ -109,15 +133,13 @@ contract Board is MultiRolesAuthority {
             lost = gameData.victory;
         }
         if (lost) {
-            // TODO(NFT damage mechanic)
             gameState.victory = false;
+            nftDamage(IAvatar, gameState.avatar, gameState.seed);
         } else {
-            // TODO(Avatar experience mechanic)
-            // TODO(Loot drop mechanic)
+            accrueExperience(IAvatar, gameState.avatar, gameState.seed);
+            lootDrop(IAvatar, gameState.avatar, gameState.seed);
             gameState.victory = true;
         }
         gameState.completed = true;
     }
-
-    // TODO(Resign)
 }

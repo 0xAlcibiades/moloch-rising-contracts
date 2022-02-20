@@ -88,7 +88,7 @@ contract Loot is ERC721, MultiRolesAuthority {
     function tokenName(uint256 id) public view returns (string memory) {
         LootInfo memory info = _lootInfo[id];
         string memory grade = "";
-        string memory name = "";
+        string memory itemName = "";
 
         // Grade mapping to strings
         if (info.grade == Grade.Common) {
@@ -105,18 +105,18 @@ contract Loot is ERC721, MultiRolesAuthority {
 
         // Name mapping to strings
         if (info.name == Name.LabCoat) {
-            name = "Lab Coat";
+            itemName = "Lab Coat";
         } else if (info.name == Name.PlasmaCutter) {
-            name = "Plasma Cutter";
+            itemName = "Plasma Cutter";
         } else if (info.name == Name.PainSuppressor) {
-            name = "Pain Suppressor";
+            itemName = "Pain Suppressor";
         }
 
-        return string(abi.encodePacked(grade, " ", name));
+        return string(abi.encodePacked(grade, " ", itemName));
     }
 
     /* solhint-disable quotes */
-    function contractURI() public view returns (string memory) {
+    function contractURI() public pure returns (string memory) {
         // TODO(add multisig here in fee_recipient)
         // TODO(update image to correct one in arweave)
         string memory json = Base64.encode(

@@ -140,9 +140,8 @@ contract Avatar is
     }
 
     /* solhint-disable quotes */
-    function contractURI() public view returns (string memory) {
+    function contractURI() public pure returns (string memory) {
         // TODO(add multisig here in fee_recipient)
-        // TODO(update image to correct one in arweave)
         string memory json = Base64.encode(
             bytes(
                 string(
