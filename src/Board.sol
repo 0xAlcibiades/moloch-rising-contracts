@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BUSL 1.1
 pragma solidity 0.8.10;
 
+import "./Loot.sol";
 import "./Avatar.sol";
 import "solmate/auth/authorities/MultiRolesAuthority.sol";
 
@@ -9,6 +10,8 @@ contract Board is MultiRolesAuthority {
         0xf395C4B180a5a08c91376fa2A503A3e3ec652Ef5;
 
     address avatar;
+
+    address loot;
 
     struct Game {
         uint256 avatar;
@@ -28,10 +31,15 @@ contract Board is MultiRolesAuthority {
 
     constructor() MultiRolesAuthority(msg.sender, Authority(address(0))) {
         setRoleCapability(0, 0x4417cb58, true);
+        setRoleCapability(0, 0x87d0040c, true);
     }
 
     function updateAvatar(address avatarContract) public requiresAuth {
         avatar = avatarContract;
+    }
+
+    function updateLoot(address lootContract) public requiresAuth {
+        loot = lootContract;
     }
 
     // Function to receive Ether. msg.data must be empty
@@ -147,7 +155,60 @@ contract Board is MultiRolesAuthority {
         uint256 avatarId,
         uint256 seed
     ) internal {
-        // TODO(A random loot drop to the player should occur)
+        (, uint64 experience, , , , , ) = IAvatar.sheet(avatarId);
+        uint256 slot;
+        slot = seed % 2;
+        if (experience < 350) {
+            // Odds of loot drop
+            // Common 15%
+            // Uncommon 10%
+            // Rare 5%
+            // Epic 2%
+            // Legendary 1%
+            uint256 roll = seed % 99;
+            if (roll >= 67 && roll < 82) {
+                // drop common
+                Loot(payable(loot)).mint(
+                    address(this),
+                    Slot(slot),
+                    Grade.Common,
+                    Name(slot)
+                );
+            } else if (roll >= 82 && roll < 92) {
+                // drop uncommon
+                Loot(payable(loot)).mint(
+                    address(this),
+                    Slot(slot),
+                    Grade.Uncommon,
+                    Name(slot)
+                );
+            } else if (roll >= 92 && roll < 97) {
+                // drop rare
+                Loot(payable(loot)).mint(
+                    address(this),
+                    Slot(slot),
+                    Grade.Rare,
+                    Name(slot)
+                );
+            } else if (roll >= 97 && roll < 99) {
+                // drop epic
+                Loot(payable(loot)).mint(
+                    address(this),
+                    Slot(slot),
+                    Grade.Epic,
+                    Name(slot)
+                );
+            } else if (roll == 99) {
+                // drop legendary
+                Loot(payable(loot)).mint(
+                
+                    address(this),
+                    Slot(slot),
+                    Grade.Legendary,
+                    Name(slot)
+                );
+            }
+        }
     }
 
     function complete(uint64 gameId, Game memory gameData) public {

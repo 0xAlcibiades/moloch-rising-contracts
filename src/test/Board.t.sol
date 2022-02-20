@@ -40,6 +40,7 @@ contract BoardTest is DSTest, ERC721Recipient, TestUtility {
             );
         hevm.stopPrank();
         board.updateAvatar(address(avatar));
+        board.updateLoot(address(loot));
         avatar.addBoard(address(board));
         loot.addBoard(address(board));
     }
@@ -57,6 +58,7 @@ contract BoardTest is DSTest, ERC721Recipient, TestUtility {
         (uint64 game1Id, Board.Game memory game1) = board.start{
             value: 0.001 ether
         }(0);
+        game1.victory = true;
         board.complete(game1Id, game1);
     }
 }

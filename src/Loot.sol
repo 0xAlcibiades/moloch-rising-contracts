@@ -21,8 +21,8 @@ enum Grade {
 }
 
 enum Name {
-    LabCoat,
     PlasmaCutter,
+    LabCoat,
     PainSuppressor
 }
 
