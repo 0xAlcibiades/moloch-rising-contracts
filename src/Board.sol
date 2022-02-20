@@ -69,7 +69,7 @@ contract Board is MultiRolesAuthority {
 
         avatarGame[avatarId] = playId;
 
-        // TODO(Add method to avatar to just get seed, for a huge gas savings - out of time)
+        // TODO(Add method to avatar to just get seed, for a huge gas savings (6 sload) - out of time)
         (, , , , , , uint256 seed) = IAvatar.sheet(avatarId);
 
         gameInstance = Game(
@@ -91,7 +91,27 @@ contract Board is MultiRolesAuthority {
         uint256 avatarId,
         uint256 seed
     ) internal {
-        // TODO(One in 10 chance for each equipped item to be damaged)
+        // 10% chance to destroy an item
+        if (seed % 9 == 9) {
+            // Chose item slot
+            uint256 slot;
+            slot = seed % 2;
+            // TODO(Add method to avatar to just get seed, for a huge gas savings (6 sload) - out of time)
+            (, , , uint256 weapon, uint256 armor, uint256 implant,) = IAvatar.sheet(avatarId);
+            uint256 item;
+            if (slot == 0) {
+                item = weapon;
+            }
+            else if (slot == 1) {
+                item = weapon;
+            }
+            else {
+                item = implant;
+            }
+            if (item != 0) {
+                // TODO(Send item to owner vault or burn)
+            }
+        }
     }
 
     function accrueExperience(
@@ -108,6 +128,7 @@ contract Board is MultiRolesAuthority {
         uint256 seed
     ) internal {
         // TODO(A random loot drop to the player should occur)
+
     }
 
     function complete(uint64 gameId, Game memory gameData) public {
