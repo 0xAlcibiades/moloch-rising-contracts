@@ -3,6 +3,7 @@ pragma solidity 0.8.10;
 
 import "./Base64.sol";
 import "solmate/tokens/ERC721.sol";
+import "solmate/auth/authorities/MultiRolesAuthority.sol";
 
 // TODO(These enumerations need mappings to strings to correctly concatenate)
 enum Slot {
@@ -31,13 +32,29 @@ struct LootInfo {
     Name name;
 }
 
-contract Loot is ERC721 {
+contract Loot is ERC721, MultiRolesAuthority {
     mapping(uint256 => LootInfo) _lootInfo;
 
     // ID 0 is reserved for "newbie loot"
     uint256 _next_id = 1;
 
-    constructor() ERC721("Moloch Rising Loot", "MRL") {}
+    mapping(address => bool) boards;
+
+    constructor()
+        MultiRolesAuthority(msg.sender, Authority(address(0)))
+        ERC721("Moloch Rising Loot", "MRL")
+    {
+        setRoleCapability(0, 0x100af824, true);
+        setRoleCapability(0, 0x2affe684, true);
+    }
+
+    function addBoard(address boardContract) public requiresAuth {
+        boards[boardContract] = true;
+    }
+
+    function removeBoard(address boardContract) public requiresAuth {
+        boards[boardContract] = false;
+    }
 
     /**
      * @dev Converts a `uint256` to its ASCII `string` decimal representation.
@@ -143,13 +160,13 @@ contract Loot is ERC721 {
 
     /* solhint-enable quotes */
 
-    // TODO(Auth, only a board can mint loot, only an admin can allow a board)
     function mint(
         address to,
         Slot slot,
         Grade grade,
         Name name
     ) public virtual {
+        require(boards[msg.sender], "Only authz board can call.");
         // Get the next token id
         uint256 tokenId = _next_id;
 

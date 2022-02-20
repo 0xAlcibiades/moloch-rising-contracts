@@ -30,6 +30,7 @@ contract AvatarTest is DSTest, ERC721Recipient, TestUtility {
         avatar = new Avatar();
         avatar.updateLoot(address(loot));
         avatar.addBoard(address(board));
+        loot.addBoard(address(board));
     }
 
     function testMint() public {
@@ -39,6 +40,7 @@ contract AvatarTest is DSTest, ERC721Recipient, TestUtility {
 
     function testEquip() public {
         avatar.mint{value: 5 ether}(address(this), "Uriel");
+        hevm.startPrank(address(board));
         loot.mint(address(this), Slot.Weapon, Grade.Epic, Name.PlasmaCutter);
         loot.mint(address(this), Slot.Armor, Grade.Uncommon, Name.LabCoat);
         loot.mint(
@@ -47,10 +49,12 @@ contract AvatarTest is DSTest, ERC721Recipient, TestUtility {
             Grade.Legendary,
             Name.PainSuppressor
         );
+        hevm.stopPrank();
         loot.setApprovalForAll(address(avatar), true);
         avatar.equip(1, 0);
         avatar.equip(2, 0);
         avatar.equip(3, 0);
+        hevm.startPrank(address(board));
         loot.mint(address(this), Slot.Weapon, Grade.Epic, Name.PlasmaCutter);
         loot.mint(address(this), Slot.Armor, Grade.Uncommon, Name.LabCoat);
         loot.mint(
@@ -59,6 +63,7 @@ contract AvatarTest is DSTest, ERC721Recipient, TestUtility {
             Grade.Legendary,
             Name.PainSuppressor
         );
+        hevm.stopPrank();
         avatar.equip(4, 0);
         avatar.equip(5, 0);
         avatar.equip(6, 0);
@@ -82,7 +87,9 @@ contract AvatarTest is DSTest, ERC721Recipient, TestUtility {
     function testUnequip() public {
         loot.setApprovalForAll(address(avatar), true);
         avatar.mint{value: 5 ether}(address(this), "Uriel");
+        hevm.startPrank(address(board));
         loot.mint(address(this), Slot.Weapon, Grade.Epic, Name.PlasmaCutter);
+        hevm.stopPrank();
         avatar.equip(1, 0);
         avatar.unequip(1, 0);
     }
@@ -94,6 +101,7 @@ contract AvatarTest is DSTest, ERC721Recipient, TestUtility {
 
     function testTokenURI() public {
         avatar.mint{value: 5 ether}(address(this), "Uriel");
+        hevm.startPrank(address(board));
         loot.mint(address(this), Slot.Weapon, Grade.Epic, Name.PlasmaCutter);
         loot.mint(address(this), Slot.Armor, Grade.Uncommon, Name.LabCoat);
         loot.mint(
@@ -102,6 +110,7 @@ contract AvatarTest is DSTest, ERC721Recipient, TestUtility {
             Grade.Legendary,
             Name.PainSuppressor
         );
+        hevm.stopPrank();
         loot.setApprovalForAll(address(avatar), true);
         avatar.equip(1, 0);
         avatar.equip(2, 0);
